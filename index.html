@@ -1,0 +1,76 @@
+<html>
+
+<body>
+<h1>Learning observer Pattern</h1>
+<h1>
+<input id = "directorTextBox" type = "textbox" value="some"><br/>
+
+<button id ="observerAdding"> Add a Checkbox which can observer the director Checkbox</button><br/>
+<div id ="observeCheckboxesContainer"></div>
+</h1>
+<script>
+function KeepObservers() {
+	this.listOfObservers = [];
+}
+
+KeepObservers.prototype.add = function (obj) {
+	return this.listOfObservers.push(obj);
+}
+
+KeepObservers.prototype.Get = function (index) {
+	if(index > - 1 && index < this.listOfObservers.length) {
+		return this.listOfObservers[index]; 
+	}
+}
+
+function extend(extension, obj) {
+	for(var key in extension){
+		obj[key] = extension[key];
+	}
+}
+
+function Subject() {
+	this.observers = new KeepObservers();
+}
+
+Subject.prototype.addAnObserver = function(observer) {
+	this.observers.add(observer);
+}
+
+Subject.prototype.Notify = function(context) {
+	console.log(this.observers.listOfObservers)
+	for (var i =0; i<this.observers.listOfObservers.length; i++){
+		this.observers.Get(i).updateMe(context);
+	}
+}
+
+function Observer() { //skeleton for observer: updateMe will be overwrite latter
+	this.updateMe = function () {
+		alert("This will be overwritten");
+	}
+}
+//Accessing HTMl element and extending controlcheckbox
+
+var controlTextBox = document.getElementById("directorTextBox"),
+addBtn = document.getElementById("observerAdding"),
+container = document.getElementById("observeCheckboxesContainer");
+extend(new Subject(), controlTextBox );
+controlTextBox["onkeyup"] = new Function ("controlTextBox.Notify(controlTextBox.value)");
+addBtn["onclick"] = addNewObserver;
+
+function addNewObserver() {
+	var textBox = document.createElement("input");
+	textBox.type = "text";
+	textBox.value = controlTextBox.value;
+	container.appendChild(textBox);
+	container.appendChild(document.createElement("br"));
+	extend(new Observer(), textBox);
+	textBox.updateMe = function(value) {
+		this.value = value;
+	}
+	controlTextBox.addAnObserver(textBox); //add new observer to the lsit of the observer
+}
+
+
+</script>
+</html>
